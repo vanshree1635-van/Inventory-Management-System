@@ -16,7 +16,7 @@ public class IssueRow {
     private final IntegerProperty qtyIssued;
     private final IntegerProperty qtyReturn = new SimpleIntegerProperty(0);
     private final BooleanProperty selected = new SimpleBooleanProperty(false);
-
+    private IntegerProperty alreadyReturned = new SimpleIntegerProperty(0);
     public IssueRow(int id,String pid,String to,String by,String dept,int qty,String date){
         this.issueId=new SimpleIntegerProperty(id);
         this.pid=new SimpleStringProperty(pid);
@@ -39,4 +39,7 @@ public class IssueRow {
     public IntegerProperty qtyIssuedProperty(){return qtyIssued;}
     public IntegerProperty qtyReturnProperty(){return qtyReturn;}
     public BooleanProperty selectedProperty(){return selected;}
+    public IntegerProperty alreadyReturnedProperty() { return alreadyReturned; }
+public int  getAlreadyReturned()              { return alreadyReturned.get(); }
+public void setAlreadyReturned(int v)         { alreadyReturned.set(v); }
 }
