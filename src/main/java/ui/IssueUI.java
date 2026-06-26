@@ -198,17 +198,35 @@ public class IssueUI {
 
                 con.setAutoCommit(false);
 
+                // ── Fetch both qty_in_stock AND min_qty_required ──
                 PreparedStatement check = con.prepareStatement(
-                        "SELECT qty_in_stock FROM product WHERE pid=?");
+                        "SELECT qty_in_stock, min_qty_required FROM product WHERE pid = ?");
                 check.setString(1, productBox.getValue().getPid());
                 ResultSet rs = check.executeQuery();
 
                 rs.next();
-                int stock = rs.getInt("qty_in_stock");
+                int stock    = rs.getInt("qty_in_stock");
+                int minQty   = rs.getInt("min_qty_required");
 
+                // ── Check 1: not enough stock at all ──
                 if (quantity > stock) {
                     new Alert(Alert.AlertType.ERROR,
                             "Insufficient stock! Available: " + stock).show();
+                    con.rollback();
+                    return;
+                }
+
+                // ── Check 2: issuing would drop stock below minimum ──
+                // After issuing, remaining stock = stock - quantity
+                // That remaining stock must stay >= minQty
+                if ((stock - quantity) < minQty) {
+                    new Alert(Alert.AlertType.ERROR,
+                            "Cannot issue " + quantity + " unit(s).\n" +
+                            "Current stock     : " + stock + "\n" +
+                            "Min. stock required: " + minQty + "\n" +
+                            "Max you can issue : " + (stock - minQty) + "\n\n" +
+                            "Please place a new order before issuing this quantity."
+                    ).show();
                     con.rollback();
                     return;
                 }
@@ -229,7 +247,7 @@ public class IssueUI {
                 insert.executeUpdate();
 
                 PreparedStatement update = con.prepareStatement(
-                        "UPDATE product SET qty_in_stock = qty_in_stock - ? WHERE pid=?");
+                        "UPDATE product SET qty_in_stock = qty_in_stock - ? WHERE pid = ?");
 
                 update.setInt(1, quantity);
                 update.setString(2, productBox.getValue().getPid());
