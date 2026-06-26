@@ -4,7 +4,7 @@ This folder contains the documentation for the Inventory Management Application.
 
 Contents:
 - Final Project Report
-- Software Requirements Specification (SRS)
+- Software Requirements Specification (SRS) and Software Design Specification (SDS)
 - User Manual
 - Project Presentation
-- Project Approval Documents
+- Manual Register photos and others
